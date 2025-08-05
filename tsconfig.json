@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "esnext",                    // 目标 ECMAScript 版本
+    "module": "esnext",                    // 使用 ES 模块
+    "moduleResolution": "node",             // 模块解析策略
+    "strict": true,                         // 启用所有严格类型检查选项
+    "jsx": "preserve",                     // JSX 代码保留
+    "baseUrl": "./",                        // 基础路径
+    "paths": {
+      "@/*": ["src/*"]                     // 路径别名配置
+    },
+    "allowSyntheticDefaultImports": true,   // 允许从没有默认导出的模块中默认导入
+    "skipLibCheck": true,                   // 跳过库文件检查，提高编译速度
+    "esModuleInterop": true,                // 启用 ES 模块的互操作性
+    "noImplicitAny": true,                  // 禁止隐式的 any 类型
+    "forceConsistentCasingInFileNames": true  // 确保文件名一致性
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ],
+  "exclude": ["node_modules"]
+}
