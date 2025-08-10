@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import MarkdownIt from 'markdown-it'
 
 const props = defineProps({
@@ -23,20 +23,40 @@ const md = new MarkdownIt({
   typographer: true   // 优化排版
 })
 const compiledMarkdown = ref('')
+const isLoading = ref(false)
+const error = ref<Error | null>(null)
 
 const renderMarkdown = async () => {
-  if (props.src) {
-    const response = await fetch(props.src)
-    const text = await response.text()
-    compiledMarkdown.value = md.render(text)
-  } else {
-    compiledMarkdown.value = md.render(props.content)
+  try {
+    isLoading.value = true
+    error.value = null
+
+    if (props.src) {
+      const response = await fetch(props.src)
+      if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`)
+      const text = await response.text()
+      compiledMarkdown.value = md.render(text)
+    } else {
+      compiledMarkdown.value = md.render(props.content)
+    }
+  } catch (err) {
+    error.value = err as Error
+    compiledMarkdown.value = '<div class="error-message">Failed to load content</div>'
+    console.error('Markdown render error:', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
-onMounted(() => {
-  renderMarkdown()
-})
+// 初始加载
+onMounted(renderMarkdown)
+
+// 监听props变化
+watch(
+    () => [props.content, props.src],
+    () => renderMarkdown(),
+    { deep: true }
+)
 </script>
 
 <style>
@@ -90,5 +110,13 @@ onMounted(() => {
   max-width: 100%;
   box-sizing: content-box;
   background-color: #fff;
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 1rem;
+  border: 1px solid #f5c6cb;
+  background-color: #f8d7da;
+  border-radius: 4px;
 }
 </style>
